@@ -1,0 +1,14 @@
+resources:
+  - name: parsephish-service
+    type: gcp-types/run-v2:projects.locations.services
+    properties:
+      parent: projects/{{ env["project"] }}/locations/europe-west4
+      serviceId: parsephish
+      template:
+        containers:
+          - image: gcr.io/{{ env["project"] }}/parsephish:latest
+            resources:
+              limits:
+                cpu: "4"
+                memory: "8Gi"
+                "nvidia.com/gpu": "1"
