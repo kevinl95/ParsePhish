@@ -1,6 +1,10 @@
 fastapi
-uvicorn
+uvicorn[standard]
 sentence-transformers
-faiss-cpu
+torch
+faiss-gpu
 beautifulsoup4
 requests
+pandas
+numpy
+pydantic

@@ -1,14 +1,51 @@
-resources:
-  - name: parsephish-service
-    type: gcp-types/run-v2:projects.locations.services
-    properties:
-      parent: projects/{{ env["project"] }}/locations/europe-west4
-      serviceId: parsephish
-      template:
-        containers:
-          - image: gcr.io/{{ env["project"] }}/parsephish:latest
-            resources:
-              limits:
-                cpu: "4"
-                memory: "8Gi"
-                "nvidia.com/gpu": "1"
+apiVersion: serving.knative.dev/v1
+kind: Service
+metadata:
+  name: parsephish-api
+  annotations:
+    run.googleapis.com/ingress: all
+    run.googleapis.com/execution-environment: gen2
+spec:
+  template:
+    metadata:
+      annotations:
+        run.googleapis.com/gpu-type: "nvidia-l4"
+        run.googleapis.com/gpu-count: "1"
+        run.googleapis.com/execution-environment: gen2
+        autoscaling.knative.dev/maxScale: "10"
+        run.googleapis.com/cpu-throttling: "false"
+    spec:
+      containers:
+      - name: parsephish
+        image: gcr.io/PROJECT_ID/parsephish:latest
+        ports:
+        - containerPort: 8080
+        env:
+        - name: PORT
+          value: "8080"
+        - name: MODEL_NAME
+          value: "intfloat/e5-small-v2"
+        resources:
+          requests:
+            cpu: "2000m"
+            memory: "8Gi"
+            nvidia.com/gpu: "1"
+          limits:
+            cpu: "4000m"
+            memory: "16Gi"
+            nvidia.com/gpu: "1"
+        startupProbe:
+          httpGet:
+            path: /health
+            port: 8080
+          initialDelaySeconds: 30
+          timeoutSeconds: 10
+          periodSeconds: 10
+          failureThreshold: 5
+        livenessProbe:
+          httpGet:
+            path: /health
+            port: 8080
+          periodSeconds: 30
+          timeoutSeconds: 10
+      serviceAccountName: parsephish-sa
