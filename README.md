@@ -6,12 +6,15 @@
 ParsePhish is a REST API that uses transformer embeddings and GPU-accelerated similarity search to analyze emails, messages, and URLs for phishing indicators. Built for the **Cloud Run GPU Category** hackathon, it runs entirely serverless on **Google Cloud Run with NVIDIA L4 GPUs**.
 
 ---
-[![Deploy to Google Cloud](https://deploy.cloud.run/button.svg)](https://deploy.cloud.run)
+[![Deploy to Google Cloud](https://deploy.cloud.run/button.svg)](https://deploy.cloud.run?git_repo=https://github.com/kevinl95/ParsePhish)
 ---
 
 ## 🚀 Quick Start
 
-### Deploy to Cloud Run
+### One-Click Deployment
+Click the "Deploy to Google Cloud" button above for automatic deployment, or:
+
+### Manual Deploy to Cloud Run
 ```bash
 # Clone the repository
 git clone https://github.com/kevinl95/ParsePhish.git
@@ -19,6 +22,12 @@ cd ParsePhish
 
 # Deploy to your Google Cloud project
 ./deploy.sh YOUR_PROJECT_ID europe-west4
+```
+
+### Using Cloud Build
+```bash
+# Deploy using Cloud Build (recommended for production)
+gcloud builds submit --config cloudbuild.yaml
 ```
 
 ### API Usage
