@@ -9,18 +9,20 @@ ParsePhish is a REST API that uses transformer embeddings and GPU-accelerated si
 [![Deploy to Google Cloud](https://deploy.cloud.run/button.svg)](https://deploy.cloud.run?git_repo=https://github.com/kevinl95/ParsePhish)
 ---
 
-## Quick Start
+## 🚀 Quick Start
 
 ### One-Click Deployment
-Click the "Deploy to Google Cloud" button above for automatic deployment, or:
+Click the "Deploy to Google Cloud" button above for automatic deployment.
 
-### Manual Deploy to Cloud Run
+**⚠️ Note**: Choose `europe-west4` region when prompted for full GPU support. Other regions may not have L4 GPU availability.
+
+### Manual Deploy to Cloud Run (Recommended)
 ```bash
 # Clone the repository
 git clone https://github.com/kevinl95/ParsePhish.git
 cd ParsePhish
 
-# Deploy to your Google Cloud project
+# Deploy with full GPU support to your Google Cloud project
 ./deploy.sh YOUR_PROJECT_ID europe-west4
 ```
 
