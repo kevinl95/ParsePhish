@@ -1,4 +1,4 @@
-FROM nvidia/cuda:11.8-devel-ubuntu20.04
+FROM python:3.11-slim
 
 # Set environment variables
 ENV DEBIAN_FRONTEND=noninteractive

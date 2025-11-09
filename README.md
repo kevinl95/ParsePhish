@@ -7,7 +7,19 @@ ParsePhish is a REST API that uses transformer embeddings and GPU-accelerated si
 
 ---
 
-## 🚀 Quick Start
+## Quick Start
+
+### Prerequisites
+Before deploying, you'll need:
+
+1. **Google Cloud CLI**: [Install gcloud](https://cloud.google.com/sdk/docs/install)
+2. **Google Cloud Project**: Create a project with billing enabled
+3. **Authentication**: Run `gcloud auth login` and `gcloud auth application-default login`
+4. **Set quota project**: Run `gcloud auth application-default set-quota-project YOUR_PROJECT_ID`
+5. **Required APIs**: The deployment script will enable these automatically:
+   - Cloud Run API
+   - Cloud Build API
+   - Container Registry API
 
 ### Deploy to Cloud Run
 ```bash
@@ -120,7 +132,12 @@ Health check endpoint for monitoring and load balancers.
 ### `GET /docs`
 Interactive API documentation (FastAPI auto-generated Swagger UI).
 
-## Development
+## 🚀 Development
+
+### Local Development Prerequisites
+- **Python 3.11+**
+- **CUDA 11.8+** (for GPU support)
+- **NVIDIA Docker** (for containerized GPU development)
 
 ### Local Development
 ```bash

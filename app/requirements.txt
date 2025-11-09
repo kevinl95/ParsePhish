@@ -2,7 +2,7 @@ fastapi
 uvicorn[standard]
 sentence-transformers
 torch
-faiss-gpu
+faiss-cpu
 beautifulsoup4
 requests
 pandas
