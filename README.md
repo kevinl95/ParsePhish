@@ -3,13 +3,13 @@
 > **GPU-powered phishing detection API on Google Cloud Run**  
 > Serverless AI-powered email and message analysis for phishing detection.
 
-ParsePhish is a REST API that uses transformer embeddings and GPU-accelerated similarity search to analyze emails, messages, and URLs for phishing indicators. Built for the **Cloud Run GPU Category** hackathon, it runs entirely serverless on **Google Cloud Run with NVIDIA L4 GPUs**.
+ParsePhish is a REST API that uses transformer embeddings and GPU-accelerated similarity search to analyze emails, messages, and URLs for phishing indicators. It runs entirely serverless on **Google Cloud Run with NVIDIA L4 GPUs**.
 
 ---
 [![Deploy to Google Cloud](https://deploy.cloud.run/button.svg)](https://deploy.cloud.run?git_repo=https://github.com/kevinl95/ParsePhish)
 ---
 
-## 🚀 Quick Start
+## Quick Start
 
 ### One-Click Deployment
 Click the "Deploy to Google Cloud" button above for automatic deployment, or:
@@ -49,36 +49,28 @@ curl -X POST https://your-service-url/analyze/url \
   -d '{"url": "https://suspicious-site.com"}'
 ```
 
-## ⚙️ How It Works
+## How It Works
 
-1. **API Endpoints**: RESTful API with endpoints for email and URL analysis
-2. **GPU Inference**: Uses NVIDIA L4 GPUs for fast embedding computation and FAISS similarity search
-3. **Real-time Analysis**: Processes phishing indicators using transformer embeddings
-4. **Auto-scaling**: Serverless deployment scales from 0 to handle traffic spikes
-5. **Privacy-First**: Content is analyzed but never stored
+ParsePhish combines modern AI techniques with GPU acceleration for fast, accurate phishing detection:
 
----
+1. **Text Processing**: Extracts and normalizes content from emails or fetched web pages
+2. **GPU-Accelerated Embeddings**: Uses transformer models to convert text into semantic vectors
+3. **Similarity Search**: FAISS GPU index finds the most similar known phishing/legitimate examples  
+4. **Intelligent Scoring**: Combines similarity scores with explicit phrase detection
+5. **Real-time Response**: Returns risk assessment in <200ms for warm requests
 
-## 🔧 Architecture
 
-```
-┌─────────────────┐    ┌──────────────────┐    ┌─────────────────┐
-│   Client App    │───▶│  ParsePhish API  │───▶│  GPU Analysis   │
-│                 │    │  (Cloud Run)     │    │  (L4 + FAISS)   │
-└─────────────────┘    └──────────────────┘    └─────────────────┘
-                              │
-                              ▼
-                       ┌──────────────────┐
-                       │  Response        │
-                       │  - phishy_score  │
-                       │  - verdict       │
-                       │  - suspect_words │
-                       └──────────────────┘
-```
+### Technical Flow
+1. **Request**: Client sends email content or URL via REST API
+2. **Processing**: Text extraction and normalization  
+3. **Embedding**: SentenceTransformer converts text to 384-dim vector
+4. **Search**: FAISS GPU finds 5 most similar training examples
+5. **Scoring**: Combines similarity votes with phrase pattern matching
+6. **Response**: Returns risk score (0-1) with explanatory details
 
 ---
 
-## 📋 API Reference
+## API Reference
 
 ### `POST /analyze/email`
 Analyze email content for phishing indicators.
@@ -101,51 +93,39 @@ Analyze email content for phishing indicators.
 ```
 
 ### `POST /analyze/url`
-Analyze URL content for phishing indicators.
+Analyze website content for phishing indicators by fetching and processing the page.
 
 **Request Body:**
 ```json
 {
-  "url": "https://example.com"
+  "url": "https://example.com/suspicious-page"
+}
+```
+
+**Response:**
+```json
+{
+  "phishy_score": 0.23,
+  "suspect_phrases": [],
+  "verdict": "Likely legitimate"
 }
 ```
 
 ### `GET /health`
-Health check endpoint.
+Health check endpoint for monitoring and load balancers.
 
----
+**Response:**
+```json
+{
+  "status": "healthy",
+  "service": "ParsePhish API"
+}
+```
 
-## 🏆 Hackathon Requirements
+### `GET /docs`
+Interactive API documentation (FastAPI auto-generated Swagger UI).
 
-✅ **Cloud Run GPU Category Requirements:**
-- ✅ Deployed on Google Cloud Run
-- ✅ Uses NVIDIA L4 GPUs for inference
-- ✅ Deployed in `europe-west4` region
-- ✅ Uses open-source models (intfloat/e5-small-v2)
-
-✅ **Additional Features:**
-- ✅ GPU-accelerated FAISS similarity search
-- ✅ Transformer-based text embeddings
-- ✅ RESTful API architecture
-- ✅ Auto-scaling serverless deployment
-- ✅ Health monitoring and probes
-
----
-
-## 🛠️ Tech Stack
-
-| Component | Technology |
-|-----------|------------|
-| **Runtime** | Google Cloud Run (GPU-enabled) |
-| **GPU** | NVIDIA L4 |
-| **Framework** | FastAPI + Python |
-| **ML Model** | SentenceTransformers (e5-small-v2) |
-| **Vector Search** | FAISS GPU |
-| **Container** | Docker with CUDA support |
-
----
-
-## 🚀 Development
+## Development
 
 ### Local Development
 ```bash
@@ -153,69 +133,61 @@ Health check endpoint.
 cd app
 pip install -r requirements.txt
 
-# Build the FAISS index
+# Build training data and FAISS index
 python download_data.py
 
-# Run the API locally
+# Start the API server
 python main.py
+# Server runs on http://localhost:8080
+# API docs at http://localhost:8080/docs
 ```
 
 ### Docker Development
 ```bash
 # Build container
-docker build -t parsephish ./app
+docker build -t parsephish .
 
 # Run with GPU support (requires NVIDIA Docker)
 docker run --gpus all -p 8080:8080 parsephish
 ```
 
----
+### Local Testing
+```bash
+# Test the API endpoints
+python test_api.py
+```
 
-## 📊 Performance
+## Security & Privacy
 
-- **Cold Start**: ~10-15 seconds (model loading + index building)
-- **Warm Requests**: <200ms per analysis
-- **Throughput**: 100+ requests/second with auto-scaling
-- **GPU Utilization**: Optimized for L4 inference
+- **No Data Persistence**: Content analyzed in memory only, never stored
+- **HTTPS-only**: All API endpoints require encrypted connections
+- **Input Validation**: Comprehensive request sanitization and rate limiting  
+- **Container Isolation**: Each request processed in isolated Cloud Run environment
+- **GPU Security**: GPU memory cleared between inference requests
 
----
+## Try It Out
 
-## 🔒 Security & Privacy
-
-- No data persistence - content analyzed in memory only
-- HTTPS-only API endpoints
-- Input validation and rate limiting
-- Isolated container execution
-
----
-
-## 📈 Future Enhancements
-
-- [ ] Real-time model updates from threat intelligence feeds
-- [ ] Batch processing for high-volume analysis
-- [ ] Integration with email security gateways
-- [ ] Custom model fine-tuning capabilities
-
----
-
-## 📄 License
-
-MIT License - see [LICENSE](LICENSE) for details.
-
----
-
-**Built for the Cloud Run GPU Hackathon 2024** 🏆
-
-Pretrained phishing examples are embedded and indexed via **FAISS GPU**,  
-allowing cosine similarity scoring in milliseconds.
-
----
-
-## 🐳 Quickstart (Local)
+Once deployed, test with these examples:
 
 ```bash
-git clone https://github.com/YOUR_USERNAME/parsephish
-cd parsephish
-docker build -t parsephish .
-docker run -p 8080:8080 parsephish
+# Obvious phishing attempt
+curl -X POST $SERVICE_URL/analyze/email \
+  -H 'Content-Type: application/json' \
+  -d '{
+    "content": "URGENT! Your account has been compromised. Click this link immediately to secure your account or it will be permanently deleted within 24 hours!",
+    "subject": "SECURITY ALERT - Action Required"
+  }'
+
+# Legitimate email
+curl -X POST $SERVICE_URL/analyze/email \
+  -H 'Content-Type: application/json' \
+  -d '{
+    "content": "Your monthly statement is now available in your online banking portal. Please log in to view your account activity.",
+    "subject": "Monthly Statement Available"
+  }'
 ```
+
+
+## License
+
+MIT License - see [LICENSE](LICENSE) for details.
