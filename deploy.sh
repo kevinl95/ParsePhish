@@ -35,7 +35,6 @@ gcloud services enable \
 
 # Build the container image
 echo "🏗️  Building container image..."
-cd app
 gcloud builds submit --tag $IMAGE_NAME .
 
 # Deploy to Cloud Run with GPU support

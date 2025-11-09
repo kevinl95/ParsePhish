@@ -3,26 +3,19 @@
 > **GPU-powered phishing detection API on Google Cloud Run**  
 > Serverless AI-powered email and message analysis for phishing detection.
 
-ParsePhish is a REST API that uses transformer embeddings and GPU-accelerated similarity search to analyze emails, messages, and URLs for phishing indicators. It runs entirely serverless on **Google Cloud Run with NVIDIA L4 GPUs**.
+ParsePhish is a REST API that uses transformer embeddings and GPU-accelerated similarity search to analyze emails, messages, and URLs for phishing indicators. Built for the **Cloud Run GPU Category** hackathon, it runs entirely serverless on **Google Cloud Run with NVIDIA L4 GPUs**.
 
----
-[![Deploy to Google Cloud](https://deploy.cloud.run/button.svg)](https://deploy.cloud.run?git_repo=https://github.com/kevinl95/ParsePhish)
 ---
 
 ## 🚀 Quick Start
 
-### One-Click Deployment
-Click the "Deploy to Google Cloud" button above for automatic deployment.
-
-**⚠️ Note**: Choose `europe-west4` region when prompted for full GPU support. Other regions may not have L4 GPU availability.
-
-### Manual Deploy to Cloud Run (Recommended)
+### Deploy to Cloud Run
 ```bash
 # Clone the repository
 git clone https://github.com/kevinl95/ParsePhish.git
 cd ParsePhish
 
-# Deploy with full GPU support to your Google Cloud project
+# Deploy with GPU support to your Google Cloud project
 ./deploy.sh YOUR_PROJECT_ID europe-west4
 ```
 

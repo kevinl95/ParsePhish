@@ -81,9 +81,8 @@ def build_faiss_index():
     dimension = embeddings.shape[1]
     logger.info(f"Creating FAISS index with dimension {dimension}")
     
-    # Use GPU index if available, otherwise CPU
+    # Use GPU index 
     try:
-        # Check if GPU is available
         import torch
         if torch.cuda.is_available():
             res = faiss.StandardGpuResources()
@@ -92,10 +91,10 @@ def build_faiss_index():
             logger.info("Using GPU FAISS index")
         else:
             index = faiss.IndexFlatL2(dimension)
-            logger.info("Using CPU FAISS index")
-    except ImportError:
+            logger.info("GPU not available, using CPU FAISS index")
+    except Exception as e:
         index = faiss.IndexFlatL2(dimension)
-        logger.info("Using CPU FAISS index")
+        logger.warning(f"GPU FAISS failed, using CPU: {e}")
     
     # Add embeddings to index
     index.add(embeddings.astype('float32'))

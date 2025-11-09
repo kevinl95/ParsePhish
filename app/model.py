@@ -31,12 +31,14 @@ def initialize_model():
         logger.info("Loading FAISS index...")
         if os.path.exists(INDEX_PATH):
             index = faiss.read_index(INDEX_PATH)
+            logger.info("FAISS index loaded successfully")
         else:
             logger.warning(f"Index file {INDEX_PATH} not found")
             
         logger.info("Loading labels...")
         if os.path.exists(LABELS_PATH):
             labels = np.load(LABELS_PATH, allow_pickle=True)
+            logger.info("Labels loaded successfully")
         else:
             logger.warning(f"Labels file {LABELS_PATH} not found")
             
