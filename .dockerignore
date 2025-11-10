@@ -1,55 +1,27 @@
 # Git files
 .git
 .gitignore
+README.md
 
 # Python cache
 __pycache__/
 *.py[cod]
 *$py.class
-*.so
-.Python
-build/
-develop-eggs/
-dist/
-downloads/
-eggs/
-.eggs/
-lib/
-lib64/
-parts/
-sdist/
-var/
-wheels/
-*.egg-info/
-.installed.cfg
-*.egg
 
 # Virtual environments
 venv/
 env/
 ENV/
 
-# IDE
+# IDE files
 .vscode/
 .idea/
 *.swp
 *.swo
-*~
 
-# Documentation
+# Documentation and assets
 *.md
 docs/
-
-# Test files
-test_*.py
-*_test.py
-tests/
-
-# Local files
-.env
-*.local
-
-# Assets and documentation
 assets/
 *.png
 *.jpg
@@ -57,7 +29,23 @@ assets/
 *.gif
 *.svg
 
-# Build artifacts
+# Test files
+test_*.py
+*_test.py
+tests/
+
+# Demo scripts
+demo_script.sh
+
+# Deployment files
+deploy.sh
+deployment/
+
+# Local files
+.env
+*.local
+
+# Build artifacts (will be generated in container)
 *.faiss
 *.npy
 phish_corpus.json

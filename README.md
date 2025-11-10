@@ -1,3 +1,7 @@
+<div align="center">
+  <img src="assets/logo.png" alt="The text ParsePhish displayed underneath a shield with a fish on it." width="200">
+</div>
+
 # ParsePhish Email Analysis API
 
 > **GPU-powered phishing detection for email content**  
