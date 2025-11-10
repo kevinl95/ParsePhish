@@ -113,7 +113,7 @@ Health check endpoint for monitoring and load balancers.
 ### `GET /docs`
 Interactive API documentation (FastAPI auto-generated Swagger UI).
 
-## 🚀 Development
+## Development
 
 ### Local Development Prerequisites
 - **Python 3.11+**
