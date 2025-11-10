@@ -44,15 +44,16 @@ gcloud run deploy $SERVICE_NAME \
     --platform managed \
     --region $REGION \
     --allow-unauthenticated \
-    --memory=8Gi \
-    --cpu=2 \
-    --timeout=300 \
-    --max-instances=10 \
+    --memory=16Gi \
+    --cpu=4 \
+    --timeout=900 \
+    --max-instances=1 \
     --port=8080 \
-    --set-env-vars="MODEL_NAME=intfloat/e5-small-v2" \
+    --set-env-vars="ENVIRONMENT=production" \
     --execution-environment=gen2 \
     --gpu=1 \
-    --gpu-type=nvidia-l4
+    --gpu-type=nvidia-l4 \
+    --no-cpu-throttling
 
 # Get the service URL
 SERVICE_URL=$(gcloud run services describe $SERVICE_NAME --platform managed --region $REGION --format 'value(status.url)')
@@ -71,11 +72,6 @@ echo "# Analyze email for phishing"
 echo "curl -X POST $SERVICE_URL/analyze/email \\"
 echo "  -H 'Content-Type: application/json' \\"
 echo "  -d '{\"content\":\"Urgent! Your account will be suspended. Click here to verify.\", \"subject\":\"Account Alert\"}'"
-echo ""
-echo "# Analyze URL for phishing"
-echo "curl -X POST $SERVICE_URL/analyze/url \\"
-echo "  -H 'Content-Type: application/json' \\"
-echo "  -d '{\"url\":\"https://suspicious-site.com\"}'"
 
 echo ""
-echo "🎉 ParsePhish API is now live and ready to detect phishing attempts!"
+echo "🎉 ParsePhish Email Analysis API is now live and ready to detect phishing attempts!"

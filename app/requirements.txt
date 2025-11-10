@@ -3,8 +3,6 @@ uvicorn[standard]
 sentence-transformers
 torch
 faiss-cpu
-beautifulsoup4
-requests
 pandas
 numpy
 pydantic

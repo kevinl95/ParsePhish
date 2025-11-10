@@ -1,10 +1,8 @@
 import os
 import logging
-import requests
 import numpy as np
 from sentence_transformers import SentenceTransformer
 import faiss
-from bs4 import BeautifulSoup
 
 logging.basicConfig(level=logging.INFO)
 logger = logging.getLogger(__name__)
@@ -46,24 +44,6 @@ def initialize_model():
     except Exception as e:
         logger.error(f"Failed to initialize model: {e}")
         raise
-
-def extract_text_from_url(url: str):
-    """Extract text content from a URL"""
-    try:
-        headers = {'User-Agent': 'Mozilla/5.0 (compatible; ParsePhish/1.0)'}
-        response = requests.get(url, timeout=10, headers=headers)
-        response.raise_for_status()
-        
-        soup = BeautifulSoup(response.text, "html.parser")
-        # Remove script and style elements
-        for script in soup(["script", "style"]):
-            script.decompose()
-        
-        text = " ".join(soup.stripped_strings)
-        return text[:5000]  # Limit to 5000 chars
-    except Exception as e:
-        logger.error(f"Error extracting text from URL {url}: {e}")
-        return f"Error fetching URL: {e}"
 
 def get_suspect_phrases(text: str):
     """Extract common phishing phrases from text"""
@@ -113,8 +93,3 @@ def get_phish_score_text(text: str):
     except Exception as e:
         logger.error(f"Error in text analysis: {e}")
         return 0.5, []  # Return moderate risk if analysis fails
-
-def get_phish_score_url(url: str):
-    """Analyze URL content for phishing indicators"""
-    text = extract_text_from_url(url)
-    return get_phish_score_text(text)

@@ -1,9 +1,9 @@
-# ParsePhish API
+# ParsePhish Email Analysis API
 
-> **GPU-powered phishing detection API on Google Cloud Run**  
-> Serverless AI-powered email and message analysis for phishing detection.
+> **GPU-powered phishing detection for email content**  
+> Serverless AI-powered email analysis using transformer embeddings and similarity search.
 
-ParsePhish is a REST API that uses transformer embeddings and GPU-accelerated similarity search to analyze emails, messages, and URLs for phishing indicators. Built for the **Cloud Run GPU Category** hackathon, it runs entirely serverless on **Google Cloud Run with NVIDIA L4 GPUs**.
+ParsePhish is a REST API that uses transformer embeddings and GPU-accelerated similarity search to analyze email content for phishing indicators. Built for the **Cloud Run GPU Category** hackathon, it runs entirely serverless on **Google Cloud Run with NVIDIA L4 GPUs**.
 
 ---
 
@@ -15,7 +15,7 @@ Before deploying, you'll need:
 1. **Google Cloud CLI**: [Install gcloud](https://cloud.google.com/sdk/docs/install)
 2. **Google Cloud Project**: Create a project with billing enabled
 3. **Authentication**: Run `gcloud auth login` and `gcloud auth application-default login`
-4. **Set quota project**: Run `gcloud auth application-default set-quota-project YOUR_PROJECT_ID`
+4. **GPU Quota**: Request NVIDIA L4 GPU quota in europe-west4 region
 5. **Required APIs**: The deployment script will enable these automatically:
    - Cloud Run API
    - Cloud Build API
@@ -31,44 +31,40 @@ cd ParsePhish
 ./deploy.sh YOUR_PROJECT_ID europe-west4
 ```
 
-### Using Cloud Build
-```bash
-# Deploy using Cloud Build (recommended for production)
-gcloud builds submit --config cloudbuild.yaml
-```
+**Important Deployment Notes:**
+- **Memory**: Requires minimum 16Gi memory for GPU instances
+- **Region**: Use europe-west4 or europe-west1 for L4 GPU availability
+- **Quota**: May require GPU quota approval (deployment script will prompt if needed)
+- **Max Instances**: Set to 1 initially to avoid quota issues
 
 ### API Usage
 ```bash
 # Check API health
-curl https://your-service-url/health
+curl https://YOUR_SERVICE_URL/health
 
 # Analyze email content for phishing
-curl -X POST https://your-service-url/analyze/email \
+curl -X POST https://YOUR_SERVICE_URL/analyze/email \
   -H 'Content-Type: application/json' \
   -d '{
     "content": "Urgent! Your account will be suspended. Click here to verify.",
     "subject": "Account Security Alert"
   }'
-
-# Analyze URL for phishing indicators
-curl -X POST https://your-service-url/analyze/url \
-  -H 'Content-Type: application/json' \
-  -d '{"url": "https://suspicious-site.com"}'
 ```
+
+> **Note**: Replace `YOUR_SERVICE_URL` with your actual deployed Cloud Run service URL.
 
 ## How It Works
 
 ParsePhish combines modern AI techniques with GPU acceleration for fast, accurate phishing detection:
 
-1. **Text Processing**: Extracts and normalizes content from emails or fetched web pages
+1. **Text Processing**: Extracts and normalizes email content (subject + body)
 2. **GPU-Accelerated Embeddings**: Uses transformer models to convert text into semantic vectors
-3. **Similarity Search**: FAISS GPU index finds the most similar known phishing/legitimate examples  
+3. **Similarity Search**: FAISS index finds the most similar known phishing/legitimate examples  
 4. **Intelligent Scoring**: Combines similarity scores with explicit phrase detection
 5. **Real-time Response**: Returns risk assessment in <200ms for warm requests
 
-
 ### Technical Flow
-1. **Request**: Client sends email content or URL via REST API
+1. **Request**: Client sends email content via REST API
 2. **Processing**: Text extraction and normalization  
 3. **Embedding**: SentenceTransformer converts text to 384-dim vector
 4. **Search**: FAISS GPU finds 5 most similar training examples
@@ -96,25 +92,6 @@ Analyze email content for phishing indicators.
   "phishy_score": 0.85,
   "suspect_phrases": ["urgent action", "verify account"],
   "verdict": "Phishing detected"
-}
-```
-
-### `POST /analyze/url`
-Analyze website content for phishing indicators by fetching and processing the page.
-
-**Request Body:**
-```json
-{
-  "url": "https://example.com/suspicious-page"
-}
-```
-
-**Response:**
-```json
-{
-  "phishy_score": 0.23,
-  "suspect_phrases": [],
-  "verdict": "Likely legitimate"
 }
 ```
 
@@ -179,9 +156,11 @@ python test_api.py
 
 ## Try It Out
 
-Once deployed, test with these examples:
+Once you deploy your instance, test with these examples:
 
 ```bash
+# Replace $SERVICE_URL with your deployed Cloud Run service URL
+
 # Obvious phishing attempt
 curl -X POST $SERVICE_URL/analyze/email \
   -H 'Content-Type: application/json' \
@@ -199,6 +178,40 @@ curl -X POST $SERVICE_URL/analyze/email \
   }'
 ```
 
+
+## Troubleshooting
+
+### Common Deployment Issues
+
+**GPU Quota Error:**
+```
+You do not have quota for using GPUs with zonal redundancy
+```
+**Solution:** Choose "Y" when prompted to deploy without zonal redundancy, or request GPU quota increase.
+
+**Build Failure with CUDA Base Image:**
+```
+manifest for nvidia/cuda:11.8-runtime-ubuntu20.04 not found
+```
+**Solution:** The Dockerfile now uses `python:3.11-slim` base image for Cloud Build compatibility. GPU support is provided by Cloud Run's GPU runtime, not the container image.
+
+**Memory Error:**
+```
+memory must be at least 16Gi
+```
+**Solution:** GPU instances require minimum 16Gi memory - this is handled in the updated deploy script.
+
+**Service Won't Start:**
+- Check Cloud Run logs: `gcloud run logs read --service=parsephish-api --region=europe-west4`
+- Verify GPU availability in your chosen region
+- Ensure all required APIs are enabled
+
+### Performance Optimization
+
+- **Cold starts**: First request may take 30-60 seconds for model initialization
+- **Warm requests**: Subsequent requests complete in <200ms
+- **GPU utilization**: Monitor via Cloud Run metrics dashboard
+- **Cost optimization**: Consider setting `--max-instances=1` for light usage
 
 ## License
 

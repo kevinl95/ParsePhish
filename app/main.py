@@ -1,6 +1,6 @@
 from fastapi import FastAPI, HTTPException
 from pydantic import BaseModel
-from model import get_phish_score_text, get_phish_score_url, initialize_model
+from model import get_phish_score_text, initialize_model
 import uvicorn
 import logging
 import os
@@ -10,17 +10,14 @@ logging.basicConfig(level=logging.INFO)
 logger = logging.getLogger(__name__)
 
 app = FastAPI(
-    title="ParsePhish API", 
-    description="AI-powered phishing detection API for emails and messages",
+    title="ParsePhish Email Analysis API",
+    description="GPU-accelerated phishing detection for email content using transformer embeddings and similarity search",
     version="1.0.0"
 )
 
 class EmailAnalysisRequest(BaseModel):
     content: str
     subject: str = None
-
-class URLAnalysisRequest(BaseModel):
-    url: str
 
 class PhishingResponse(BaseModel):
     phishy_score: float
@@ -66,19 +63,6 @@ def analyze_email(request: EmailAnalysisRequest):
         )
     except Exception as e:
         raise HTTPException(status_code=500, detail=f"Analysis failed: {str(e)}")
-
-@app.post("/analyze/url", response_model=PhishingResponse)  
-def analyze_url(request: URLAnalysisRequest):
-    """Analyze URL content for phishing indicators"""
-    try:
-        score, highlights = get_phish_score_url(request.url)
-        return PhishingResponse(
-            phishy_score=score,
-            suspect_phrases=highlights,
-            verdict="Phishing detected" if score > 0.7 else "Likely legitimate"
-        )
-    except Exception as e:
-        raise HTTPException(status_code=500, detail=f"URL analysis failed: {str(e)}")
 
 if __name__ == "__main__":
     uvicorn.run(app, host="0.0.0.0", port=8080)
